@@ -75,7 +75,7 @@ binauralFIR.connect(audioContext.destination);
   binauralFIRNode.setPosition(0, 0, 1);
 
   //Load player file
-  bufferLoader.load('./snd/breakbeat.wav').then(function(buffer){
+  bufferLoader.load('./utils/breakbeat.wav').then(function(buffer){
     player.setBuffer(buffer);
     player.enableLoop(true);
   })
