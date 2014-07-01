@@ -7,6 +7,15 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
     <script src="js/highlight.pack.js"></script>
     <link rel="stylesheet" href="css/main.css">
+    
+    <script src="//cdnjs.cloudflare.com/ajax/libs/q.js/1.0.1/q.js"></script>
+    <script src="//rawgit.com/ircam-rnd/buffer-loader/master/buffer-loader.min.js"></script>
+    <script src="//rawgit.com/ircam-rnd/player/master/player.min.js"></script>
+    <script src="//rawgit.com/Ircam-RnD/binauralFIR/master/binauralfir.min.js"></script>
+
+    <script src="//rawgit.com/Ircam-RnD/binauralFIR/master/examples/snd/complete_hrtfs.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <script src="//rawgit.com/aterrien/jQuery-Knob/master/js/jquery.knob.js"></script>
   </head>
   <body>
 
@@ -33,15 +42,6 @@ binauralFIR.connect(audioContext.destination);
 <p>We provide a HRTF dataset example provided by <a href="http://www.ircam.fr/">IRCAM</a> in the /example/snd/complete_hrtfs.js file.</p>
 
     <h3 id="demo">Demo</h3>
-<script src="//cdnjs.cloudflare.com/ajax/libs/q.js/1.0.1/q.js"></script>
-<script src="//rawgit.com/ircam-rnd/buffer-loader/master/buffer-loader.min.js"></script>
-<script src="//rawgit.com/ircam-rnd/player/master/player.min.js"></script>
-<script src="//rawgit.com/Ircam-RnD/binauralFIR/master/binauralfir.min.js"></script>
-
-<script src="//rawgit.com/Ircam-RnD/binauralFIR/master/examples/snd/complete_hrtfs.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-<script src="//rawgit.com/aterrien/jQuery-Knob/master/js/jquery.knob.js"></script>
-
 <script>
   var audioContext = new AudioContext();
   var bufferLoader = createBufferLoader();
