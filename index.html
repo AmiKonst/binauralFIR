@@ -1,0 +1,185 @@
+<!doctype html>
+<html class="no-js" lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>createBinauralFIR</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <script src="js/highlight.pack.js"></script>
+    <link rel="stylesheet" href="css/main.css">
+  </head>
+  <body>
+
+  <header>
+    <nav>
+      <ul>
+        <li><a class="icon-github" href="https://github.com/Ircam-RnD/binauralFIR.git">Source on GitHub</a></li>
+        <li class="updated"><em>Last updated: 1/July/2014</em></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <hr>
+
+  <section>
+    <h2 id="binauralfir-node">BinauralFIR node</h2>
+<blockquote>
+<p>Processing node which spatializes an incoming audio stream in three-dimensional space for binaural audio.</p>
+</blockquote>
+<p>The binauralFIR node provides binaural listening to the user with three simple steps. The novelty of this library is that it permits to use your own HRTF dataset. This library can be used as a regular node - AudioNode - inside the <a href="http://www.w3.org/TR/webaudio/">Web Audio API</a>. You can connect the native nodes to the binauralFIR node by using the connect method to binauralFIR.input: </p>
+<pre><code class="lang-js">nativeNode.connect(binauralFIR.input);
+binauralFIR.connect(audioContext.destination);
+</code></pre>
+<p>We provide a HRTF dataset example provided by <a href="http://www.ircam.fr/">IRCAM</a> in the /example/snd/complete_hrtfs.js file.</p>
+
+    
+    <h3 id="example">Example</h3>
+<p>Load binauralFIR.js, for instance in your html file by using:</p>
+<pre><code class="lang-html">    &lt;script src=&quot;binuralfir.min.js&quot;&gt;&lt;/script&gt;
+    &lt;!-- https://github.com/Ircam-RnD/buffer-loader  We need a way to load and decode the HRTF files, so we use this lib --&gt;
+    &lt;script src=&quot;buffer-loader.min.js&quot;&gt;&lt;/script&gt;
+    &lt;!-- https://github.com/Ircam-RnD/player - We use this player to play a sound --&gt;
+    &lt;script src=&quot;player.min.js&quot;&gt;&lt;/script&gt;
+    &lt;!-- You can find the file with the HRTF dataset in  /examples/snd/complete_hrtfs.js folder.--&gt;
+    &lt;script src =&quot;complete_hrtfs.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+<pre><code class="lang-js">  // First we generate the HRTF Dataset input format.
+  // The hrtfs Array can be find in the complet_hrtfs.js file. It contains an Array of objects with the azimuth,
+  // elevation, distance information, and the coefficients of the left and right FIR filters for each position.
+  for(var i = 0; i &lt; hrtfs.length; i++){
+    var buffer = audioContext.createBuffer(2, 512, 44100);
+    var bufferChannelLeft = buffer.getChannelData(0);
+    var bufferChannelRight = buffer.getChannelData(1);
+    for(var e = 0; e &lt; hrtfs[i].fir_coeffs_left.length; e++){
+      bufferChannelLeft[e] = hrtfs[i].fir_coeffs_left[e];
+      bufferChannelRight[e] = hrtfs[i].fir_coeffs_right[e];
+    }
+    hrtfs[i].buffer = buffer;
+  }
+
+  // We need an audio context
+  var audioContext = new AudioContext();
+  var targetNode = audioContext.destination;
+  //Create Audio Nodes
+  var player = createPlayer();
+  var binauralFIRNode = createBinauralFIR();
+
+  // Set HRTF dataset
+  binauralFIRNode.HRTFDataset = hrtfs;
+
+  // Connect Audio Nodes
+  player.connect(binauralFIRNode.input);
+  binauralFIRNode.connect(targetNode);
+  // Set the position of the virtual source to -45° azimuth - 45° on your left -, distance of 1 meter and elevation of 10º
+  binauralFIRNode.setPosition(-45, 10, 1);
+
+  // Load player file
+  bufferLoader.load(&#39;/examples/snd/breakbeat.wav&#39;).then(function(buffer){
+    player.setBuffer(buffer);
+    player.enableLoop(true);
+    player.start();
+  })
+</code></pre>
+<h3 id="hrtf-dataset-format">HRTF dataset format</h3>
+<p>As this library allow you to use your own <a href="http://en.wikipedia.org/wiki/Head-related_transfer_function">HRTF</a> Dataset, if you want to use your dataset in the library you have to follow the following format:</p>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>azimuth</code></td>
+<td>Azimuth in degrees: from 0 to -180 for source on your left, and from 0 to 180 for source on your right</td>
+</tr>
+<tr>
+<td><code>distance</code></td>
+<td>Distance in meters</td>
+</tr>
+<tr>
+<td><code>elevation</code></td>
+<td>Elevation in degrees: from 0 to 90 for source above your head, 0 for source in front of your head, and from 0 to -90 for source below your head)</td>
+</tr>
+<tr>
+<td><code>buffer</code></td>
+<td>AudioBuffer representing the decoded audio data. An audio file can be decoded by using the [buffer-loader library] (<a href="https://github.com/Ircam-RnD/buffer-loader">https://github.com/Ircam-RnD/buffer-loader</a>)</td>
+</tr>
+</tbody>
+</table>
+<p>This data must be provided inside an Array of Objects, like this example:</p>
+<pre><code class="lang-js">[
+  {
+    &#39;azimuth&#39;: 0,
+    &#39;distance&#39;: 1,
+    &#39;elevation&#39;: 0,
+    &#39;buffer&#39;: AudioBuffer
+  },
+  {
+    &#39;azimuth&#39;: 5,
+    &#39;distance&#39;: 1,
+    &#39;elevation&#39;: 0,
+    &#39;buffer&#39;: AudioBuffer
+
+  },
+  {
+    &#39;azimuth&#39;: 5,
+    &#39;distance&#39;: 1,
+    &#39;elevation&#39;: 5,
+    &#39;buffer&#39;: AudioBuffer
+  }
+]
+</code></pre>
+<h3 id="api">API</h3>
+<p>The <code>binauralFIR</code> object exposes the following API:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>binauralFIR.connect()</code></td>
+<td>Connects the binauralFIRNode to the Web Audio graph</td>
+</tr>
+<tr>
+<td><code>binauralFIR.disconnect()</code></td>
+<td>Disconnect the binauralFIRNode from the Web Audio graph</td>
+</tr>
+<tr>
+<td><code>binauralFIR.HRTFDataset</code></td>
+<td>Set HRTF Dataset to be used with the virtual source.</td>
+</tr>
+<tr>
+<td><code>binauralFIR.setPosition(azimuth, elevation, distance)</code></td>
+<td>Set position of the virtual source.</td>
+</tr>
+<tr>
+<td><code>binauralFIR.getPosition()</code></td>
+<td>Get the current position of the virtual source.</td>
+</tr>
+<tr>
+<td><code>binauralFIR.setCrossfadeDuration(duration)</code></td>
+<td>Set the duration of crossfading in miliseconds.</td>
+</tr>
+<tr>
+<td><code>binauralFIR.getCrossfadeDuration()</code></td>
+<td>Get the duration of crossfading in miliseconds.</td>
+</tr>
+</tbody>
+</table>
+
+  </section>
+
+  <hr>
+
+  <footer>
+    <p>This code has been developed from both <a href="http://recherche.ircam.fr/equipes/salles/">Acoustic And Cognitive Spaces</a> and <a href="http://apm.ircam.fr">Analysis of Musical Practices</a> IRCAM research teams. It is also part of the WAVE project (<a href="http://wave.ircam.fr">http://wave.ircam.fr</a>), funded by ANR (The French National Research Agency), ContInt program, 2012-2015.</p>
+
+  </footer>
+  <script>hljs.initHighlightingOnLoad();</script>
+  </body>
+</html>
