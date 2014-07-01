@@ -16,6 +16,11 @@
     <script src="//rawgit.com/Ircam-RnD/binauralFIR/master/examples/snd/complete_hrtfs.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
     <script src="//rawgit.com/aterrien/jQuery-Knob/master/js/jquery.knob.js"></script>
+
+    <script src="./snd/complete_hrtfs.js"></script>
+    <script src="//rawgit.com/Ircam-RnD/binauralFIR/master/examples/js/jquery-1.11.1.min.js"></script>
+    <script src="//rawgit.com/Ircam-RnD/binauralFIR/master/examples/js/jquery.knob.js"></script>
+    
   </head>
   <body>
 
@@ -70,7 +75,7 @@ binauralFIR.connect(audioContext.destination);
   binauralFIRNode.setPosition(0, 0, 1);
 
   //Load player file
-  bufferLoader.load('/examples/snd/breakbeat.wav').then(function(buffer){
+  bufferLoader.load('./snd/breakbeat.wav').then(function(buffer){
     player.setBuffer(buffer);
     player.enableLoop(true);
   })
